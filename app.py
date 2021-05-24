@@ -26,6 +26,27 @@ from sqlalchemy.orm import sessionmaker
 Session = sessionmaker(bind=engine)
 session = Session()
 
+#Json
+def ownerToJson(self):
+    return {
+            'number': self.number,
+            'majorAndClass': self.majorAndClass,
+            'name': self.name,
+            'phone': self.phone,
+            'license': self.license
+            }
+
+def violationToJson(self):
+    return {
+            'violationNumber': self.violationNumber,
+            'license': self.license,
+            'date': 
+            str(self.date.year)+"-"+
+            str(self.date.month)+"-"+
+            str(self.date.day),
+            'detail': self.detail
+            }
+
 from flask import Flask, request, jsonify
 app = Flask(__name__)
 
@@ -37,4 +58,21 @@ def hello_world():
 def query(licenseNumber):
     licenseOwner=base.classes.LicenseOwner
     data = session.query(licenseOwner).filter(licenseOwner.license == int(licenseNumber)).first()
-    return {'number':data.number,'class':data.majorAndClass,'name':data.name,'phone':data.phone}
+    return ownerToJson(data)
+
+@app.route('/queryViolation/<string:licenseNumber>')
+def queryViolation(licenseNumber):
+    violation=base.classes.Violation
+    datas = session.query(violation).filter(violation.license == int(licenseNumber)).all()
+    temp = []
+    for data in datas:
+        temp.append(violationToJson(data))
+    return jsonify(objects = temp),200,{"ContentType":"application/json"}
+
+@app.route('/addViolation/<string:licenseNumber>', methods=["POST"])
+def addViolation(licenseNumber):
+    #TODO: 加密码鉴权
+    violation=base.classes.Violation
+    session.add(violation(license=int(licenseNumber),detail=request.form["detail"]))
+    session.commit()
+    return "succeed"
