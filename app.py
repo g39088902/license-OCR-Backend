@@ -9,7 +9,7 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.automap import automap_base
 try:
     print(curTime()+"开始连接SQL，请稍等")
-    engine = create_engine("postgresql://postgres:MeiYouMiMa!@infiiinity.xyz:5432/license",echo=False)
+    engine = create_engine("postgresql://postgres:MeiYouMiMa!@infiiinity.xyz:5432/license",echo=False) # 该数据库和密码已经停用，请自行配置
     base = automap_base()
     base.prepare(engine, reflect=True)
 
